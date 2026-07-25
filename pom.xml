@@ -163,7 +163,7 @@
         <testcontainers-junit4-mock.version>1.0.2</testcontainers-junit4-mock.version>
         <zeroturnaround.version>1.12</zeroturnaround.version>
         <webdrivermanager.version>6.1.0</webdrivermanager.version>
-        <allure-testng.version>2.27.0</allure-testng.version>
+        <allure-testng.version>2.35.4</allure-testng.version>
         <allure-maven.version>2.12.0</allure-maven.version>
 
         <opensmpp.version>3.0.2</opensmpp.version>
