@@ -1,0 +1,60 @@
+#
+# Copyright © 2016-2026 The Thingsboard Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# codelogic-build-feedback
+name: CodeLogic Build Feedback
+
+on:
+  push:
+    branches:
+      - master
+      - 'codelogic/**'
+
+jobs:
+  build:
+    name: Build and report to CodeLogic
+    runs-on: ubuntu-22.04
+    env:
+      NO_COLOR: "1"
+      TERM: "dumb"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '25'
+          cache: 'maven'
+
+      - name: Build
+        run: |
+          set -o pipefail
+          mvn -B license:format clean install -DskipTests -Dpkg.skip=true 2>&1 | tee "${{ github.workspace }}/build.log"
+
+      - name: Send CodeLogic Build Info
+        if: always()
+        uses: CodeLogicIncEngineering/codelogic-send-build-info-github-action@v1.0.2
+        with:
+          codelogic_host: ${{ vars.CODELOGIC_HOST }}
+          agent_uuid: ${{ vars.AGENT_UUID }}
+          agent_password: ${{ secrets.AGENT_PASSWORD }}
+          job_name: ${{ github.workflow }}
+          build_number: ${{ github.run_number }}
+          build_status: ${{ job.status }}
+          pipeline_system: GitHub Actions
+          log_file: /github/workspace/build.log
