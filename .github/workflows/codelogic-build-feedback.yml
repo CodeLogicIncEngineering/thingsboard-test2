@@ -15,42 +15,36 @@
 #
 
 # codelogic-build-feedback
-#
-# Sends build results to CodeLogic so failed builds on CodeLogic upgrade
-# branches can trigger automated fixes.
-# https://docs.codelogic.com/Send_Build_Info/
-
 name: CodeLogic Build Feedback
 
 on:
   push:
     branches:
+      - master
       - 'codelogic/**'
-  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 180
-
+    name: Build and report to CodeLogic
+    runs-on: ubuntu-22.04
+    env:
+      NO_COLOR: "1"
+      TERM: "dumb"
     steps:
-      - name: Checkout Repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'corretto' # https://github.com/actions/setup-java?tab=readme-ov-file#supported-distributions
+          distribution: 'corretto'
           java-version: '25'
-          cache: 'maven' # https://github.com/actions/setup-java?tab=readme-ov-file#caching-sbt-dependencies
+          cache: 'maven'
 
       - name: Build
-        env:
-          NO_COLOR: "1"
-          TERM: "dumb"
         run: |
           set -o pipefail
-          mvn -T 1C -B -DskipTests clean install 2>&1 | tee build.log
+          mvn -B license:format clean install -DskipTests -Dpkg.skip=true 2>&1 | tee "${{ github.workspace }}/build.log"
 
       - name: Send CodeLogic Build Info
         if: always()
@@ -59,7 +53,6 @@ jobs:
           codelogic_host: ${{ vars.CODELOGIC_HOST }}
           agent_uuid: ${{ vars.AGENT_UUID }}
           agent_password: ${{ secrets.AGENT_PASSWORD }}
-          scan_path: /github/workspace
           job_name: ${{ github.workflow }}
           build_number: ${{ github.run_number }}
           build_status: ${{ job.status }}
