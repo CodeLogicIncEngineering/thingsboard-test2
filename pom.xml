@@ -85,7 +85,7 @@
         <nimbus-jose-jwt.version>10.0.2</nimbus-jose-jwt.version> <!-- to fix CVE-2023-52428, CVE-2025-53864. TODO: remove when fixed in spring-security-oauth2-client and mockserver-netty   -->
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <joda-time.version>2.12.7</joda-time.version>
-        <auth0-jwt.version>4.4.0</auth0-jwt.version>
+        <auth0-jwt.version>4.6.0</auth0-jwt.version>
         <json-schema-validator.version>1.5.6</json-schema-validator.version>
         <milo.version>0.6.12</milo.version>
         <californium.version>3.12.1</californium.version>
